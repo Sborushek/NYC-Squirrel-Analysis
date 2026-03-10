@@ -1,0 +1,122 @@
+---
+title: "Final Project Report"
+output: html_document
+---
+By: Sasha, Grace, Mark, and Tyler
+
+Group: DIS315:4
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r echo = FALSE, warning = FALSE, message = FALSE}
+library(tidyverse)
+squirrel <- read_csv("../../data/2018_Central_Park_Squirrel_Census_-_Squirrel_Data_20251104.csv")
+
+#head(squirrel)
+```
+# Introduction
+
+Central Park is home to an estimated 2,373 squirrels, which were introduced in the 1870s and thrive by eating nuts, seeds, and berries. 
+These squirrels are known for their varied fur colors, including gray, cinnamon, and black, though some squirrels have unique color variations. 
+
+We would like to find out which color squirrel is more common than others at the park (if there is one), specifically paying attention to the gray colored squirrels. 
+
+**Question of Interest: ** Are gray squirrels more common in Central Park than other color squirrels?
+
+**Thesis: ** We were able to find strong evidence to conclude that gray squirrels appeared more often than other color squirrels in our data set, therefore implying that gray might be the more common fur color in Central Park.
+
+# Background and Graph
+
+The data that we are using is called "2018 Central Park Squirrel Census - Squirrel Data," found on the NYC Open Data website.
+
+**Description of data set:**
+
+- This data was collected by “Squirrel Sighters” encompassing 700 total squirrel-counting sessions over 350 “countable” park hectares, tallying sightings and gathering material data on their activities. They wanted to keep track of the squirrels in Central Park due to a general interest in squirrels as a hobby.
+
+- A single row of data represents an individual squirrel spotted, including age, action, time of sighting, date of sighting, and specific location of the squirrel.
+
+- We will be using the variable of the primary color of the squirrels listed in the data set to see which color appears the most
+
+- This dataset is a sample of the squirrel population of Central Park
+
+- **Possible shortcoming:** Squirrels might be counted multiple times, leading to unreliable data.
+
+**What the clean data includes (Squirrel ID, age, color): **
+```{r echo = FALSE, warning = FALSE, message = FALSE}
+squirrel_clean <- squirrel %>%
+  drop_na("Primary Fur Color") %>%
+  select("Unique Squirrel ID", Age, "Primary Fur Color") %>%
+  rename(color = "Primary Fur Color")
+  
+  
+
+head(squirrel_clean)
+
+
+```
+ 
+ 
+**Graph: **
+
+The graph relates to our thesis question by measuring the frequency of what kind of squirrel appears. The x-axis represents the color of the squirrel and the y-axis represents the count. 
+
+There are close to 2500 gray squirrels that showed up during the sighting period, as opposed to about 400 cinnamon squirrels and less than 100 black squirrels. 
+
+```{r echo = FALSE, warning = FALSE, message = FALSE}
+ggplot(squirrel_clean, aes(color, fill = color)) + 
+  geom_bar() + 
+  scale_fill_manual(values = c("Gray" = "gray45", "Cinnamon" = "sienna", "Black" = "black")) + 
+  labs(title = "Squirrel Colors",
+       x = "Squirrel Color",
+       y = "Count")
+```
+
+# Statistical Analysis
+
+**Method Used:** Inference on a single population proportion
+
+Since we'll be using a binomial distribution, we need to confirm that our scenario can be binomial:
+
+- B: Either Gray or Not
+
+- I: Each squirrel independent of the other
+
+- N: 2968 squirrel sightings
+
+- S: Same probability of being gray
+
+**Hypotheses:**
+
+Null Hypothesis: Gray squirrels are just as common as the other color squirrels (p = 0.33)
+
+Alternate Hypothesis: Gray squirrels appear more frequently than other colored squirrels (p > 0.33).
+
+**Confidence level:** 95%, alpha of 0.05
+
+```{r echo = FALSE, warning = FALSE, message = FALSE}
+
+n <- nrow(squirrel_clean)
+test_stat <- sum(squirrel_clean$color == "Gray")
+
+p_value <- 1-pbinom(test_stat,n,0.33)
+
+
+```
+
+
+**Sample Size (n):** 2968 squirrels
+
+**Test Statistic:** 2473 gray squirrels -> p = 0.833
+
+We will use a pbinom() to get our p-value:
+
+**p-value:** so small that 0 is displayed, which is less than 0.05
+
+
+
+
+# Discussion
+
+Based off our hypothesis test, our p value is < 0.05, so we have evidence that the proportion of squirrel colors are not all equal in Central park. Therefore, we can reject our null hypothesis, and we can conclude that grey squirrels appear more than the other colors of squirrels in Central Park. While some squirrels might have been counted more than one time in the data set, we chose to count each entry as a separate squirrel due to the difficulty of differentiating between duplicates. For future research, it would be more accurate to use tools to track unique squirrels each time.
+
